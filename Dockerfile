@@ -28,11 +28,8 @@ RUN \
   cabal install \
     alex \
     happy && \
-  git clone --depth=1 --recursive --shallow-submodules -c fetch.parallel=0 -c submodule.fetchJobs=0 https://gitlab.haskell.org/ghc/ghc.git /tmp/ghc-boot && \
+  git clone --branch ghc-9.6 --depth=1 --recursive --shallow-submodules -c fetch.parallel=0 -c submodule.fetchJobs=0 https://gitlab.haskell.org/ghc/ghc.git /tmp/ghc-boot && \
   cd /tmp/ghc-boot && \
-  cd utils/hsc2hs && \
-  curl -f -L --retry 5 https://patch-diff.githubusercontent.com/raw/haskell/hsc2hs/pull/76.patch | git apply && \
-  cd ../.. && \
   ./boot && \
   ./configure \
     --with-intree-gmp \
@@ -46,10 +43,11 @@ RUN \
   unzip libffi-wasm.zip && \
   mv out/libffi-wasm/include/* /opt/wasi-sdk/share/wasi-sysroot/include && \
   mv out/libffi-wasm/lib/* /opt/wasi-sdk/share/wasi-sysroot/lib/wasm32-wasi && \
-  cp -a /tmp/ghc-boot /tmp/ghc && \
+  git clone --depth=1 --recursive --shallow-submodules -c fetch.parallel=0 -c submodule.fetchJobs=0 https://gitlab.haskell.org/ghc/ghc.git /tmp/ghc && \
   cd /tmp/ghc && \
-  git clean -xdf && \
-  git submodule foreach --recursive git clean -xdf && \
+  cd utils/hsc2hs && \
+  curl -f -L --retry 5 https://patch-diff.githubusercontent.com/raw/haskell/hsc2hs/pull/76.patch | git apply && \
+  cd ../.. && \
   ./boot && \
   ./configure \
     --host=aarch64-alpine-linux \
